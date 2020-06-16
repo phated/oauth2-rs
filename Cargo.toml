@@ -14,26 +14,14 @@ all-features = true
 [badges]
 maintenance = { status = "actively-developed" }
 
-[features]
-default = ["reqwest-09"]
-futures-01 = ["futures-0-1"]
-futures-03 = ["futures-0-3", "async-trait"]
-reqwest-09 = ["reqwest-0-9"]
-reqwest-010 = ["reqwest-0-10", "http-0-2"]
-
 [dependencies]
-async-trait = { version = "0.1", optional = true }
+async-trait = "0.1"
 base64 = "0.12"
-curl = { version = "0.4.0", optional = true }
 failure = "0.1"
 failure_derive = "0.1"
-futures-0-1 = { version = "0.1", optional = true, package = "futures" }
-futures-0-3 = { version = "0.3", optional = true, package = "futures" }
-http = "0.1"
-http-0-2 = { version = "0.2", optional = true, package = "http" }
+futures = "0.3"
+http = "0.2"
 rand = "0.7"
-reqwest-0-9 = { version = "0.9", optional = true, package = "reqwest" }
-reqwest-0-10 = { version = "0.10", optional = true, features = ["blocking"], package = "reqwest" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sha2 = "0.8"

@@ -5,7 +5,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use failure::Fail;
-use futures_0_3::Future;
+use futures::Future;
 
 ///
 /// Asynchronous request to exchange an authorization code for an access token.

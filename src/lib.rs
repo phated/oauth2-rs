@@ -89,7 +89,7 @@
 //!     .exchange_code(AuthorizationCode::new("some authorization code".to_string()))
 //!     // Set the PKCE code verifier.
 //!     .set_pkce_verifier(pkce_verifier)
-//!     .request_async(async_http_client)
+//!     .request(async_http_client)
 //!     .await?;
 //!
 //! // Unwrapping token_result will either produce a Token or a RequestTokenError.
@@ -245,16 +245,12 @@ use std::marker::PhantomData;
 use std::time::Duration;
 
 use failure::Fail;
+use futures::Future;
 use http_types::headers::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use http_types::{Method, Request, Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use url::{form_urlencoded, Url};
-
-///
-/// Async/await module
-///
-mod async_internal;
 
 ///
 /// Basic OAuth2 implementation with no extensions
@@ -282,11 +278,6 @@ pub use types::{
     AccessToken, AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, PkceCodeChallenge,
     PkceCodeChallengeMethod, PkceCodeVerifier, RedirectUrl, RefreshToken, ResourceOwnerPassword,
     ResourceOwnerUsername, ResponseType, Scope, TokenUrl,
-};
-
-pub use async_internal::{
-    AsyncClientCredentialsTokenRequest, AsyncCodeTokenRequest, AsyncPasswordTokenRequest,
-    AsyncRefreshTokenRequest,
 };
 
 const CONTENT_TYPE_JSON: &str = "application/json";
@@ -673,9 +664,9 @@ where
 }
 impl<'a, TE, TR, TT> CodeTokenRequest<'a, TE, TR, TT>
 where
-    TE: ErrorResponse,
-    TR: TokenResponse<TT>,
-    TT: TokenType,
+    TE: ErrorResponse + 'static,
+    TR: TokenResponse<TT> + Send,
+    TT: TokenType + Send,
 {
     ///
     /// Appends an extra param to the token request.
@@ -711,6 +702,22 @@ where
     pub fn set_pkce_verifier(mut self, pkce_verifier: PkceCodeVerifier) -> Self {
         self.pkce_verifier = Some(pkce_verifier);
         self
+    }
+
+    ///
+    /// Asynchronously sends the request to the authorization server and returns a Future.
+    ///
+    pub async fn request<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
+    where
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
+        RE: Fail,
+    {
+        let http_request = self.prepare_request()?;
+        let http_response = http_client(http_request)
+            .await
+            .map_err(RequestTokenError::Request)?;
+        token_response(http_response).await
     }
 
     fn prepare_request<RE>(self) -> Result<Request, RequestTokenError<RE, TE>>
@@ -762,9 +769,9 @@ where
 }
 impl<'a, TE, TR, TT> RefreshTokenRequest<'a, TE, TR, TT>
 where
-    TE: ErrorResponse,
-    TR: TokenResponse<TT>,
-    TT: TokenType,
+    TE: ErrorResponse + 'static,
+    TR: TokenResponse<TT> + Send,
+    TT: TokenType + Send,
 {
     ///
     /// Appends an extra param to the token request.
@@ -796,6 +803,22 @@ where
     pub fn add_scope(mut self, scope: Scope) -> Self {
         self.scopes.push(Cow::Owned(scope));
         self
+    }
+
+    ///
+    /// Asynchronously sends the request to the authorization server and awaits a response.
+    ///
+    pub async fn request<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
+    where
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
+        RE: Fail,
+    {
+        let http_request = self.prepare_request()?;
+        let http_response = http_client(http_request)
+            .await
+            .map_err(RequestTokenError::Request)?;
+        token_response(http_response).await
     }
 
     fn prepare_request<RE>(&self) -> Result<Request, RequestTokenError<RE, TE>>
@@ -843,9 +866,9 @@ where
 }
 impl<'a, TE, TR, TT> PasswordTokenRequest<'a, TE, TR, TT>
 where
-    TE: ErrorResponse,
-    TR: TokenResponse<TT>,
-    TT: TokenType,
+    TE: ErrorResponse + 'static,
+    TR: TokenResponse<TT> + Send,
+    TT: TokenType + Send,
 {
     ///
     /// Appends an extra param to the token request.
@@ -877,6 +900,22 @@ where
     pub fn add_scope(mut self, scope: Scope) -> Self {
         self.scopes.push(Cow::Owned(scope));
         self
+    }
+
+    ///
+    /// Asynchronously sends the request to the authorization server and awaits a response.
+    ///
+    pub async fn request<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
+    where
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
+        RE: Fail,
+    {
+        let http_request = self.prepare_request()?;
+        let http_response = http_client(http_request)
+            .await
+            .map_err(RequestTokenError::Request)?;
+        token_response(http_response).await
     }
 
     fn prepare_request<RE>(&self) -> Result<Request, RequestTokenError<RE, TE>>
@@ -957,6 +996,22 @@ where
     pub fn add_scope(mut self, scope: Scope) -> Self {
         self.scopes.push(Cow::Owned(scope));
         self
+    }
+
+    ///
+    /// Asynchronously sends the request to the authorization server and awaits a response.
+    ///
+    pub async fn request<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
+    where
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
+        RE: Fail,
+    {
+        let http_request = self.prepare_request()?;
+        let http_response = http_client(http_request)
+            .await
+            .map_err(RequestTokenError::Request)?;
+        token_response(http_response).await
     }
 
     fn prepare_request<RE>(&self) -> Result<Request, RequestTokenError<RE, TE>>

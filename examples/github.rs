@@ -17,7 +17,7 @@ use oauth2::basic::BasicClient;
 
 // Alternatively, this can be `oauth2::curl::http_client` or a custom client.
 use oauth2::{
-    AsyncCodeTokenRequest, AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken,
+    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken,
     TokenResponse, RedirectUrl, Scope, TokenUrl,
 };
 use std::env;
@@ -148,7 +148,7 @@ fn main() {
                 );
 
                 // Exchange the code with a token.
-                let token_res = client.exchange_code(code).request_async(async_http_client).await;
+                let token_res = client.exchange_code(code).request(async_http_client).await;
 
                 println!("Github returned the following token:\n{:?}\n", token_res);
 

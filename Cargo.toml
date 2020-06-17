@@ -20,7 +20,7 @@ base64 = "0.12"
 failure = "0.1"
 failure_derive = "0.1"
 futures = "0.3"
-http = "0.2"
+http-types = "2.1"
 rand = "0.7"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -31,5 +31,6 @@ url = "2.1"
 [dev-dependencies]
 hex = "=0.4.0"
 rust-crypto = "0.2.36"
-tokio = "0.1"
+smol = "0.1"
+http-client = "3.0"
 uuid = { version = "0.8.1", features = ["v4"] }

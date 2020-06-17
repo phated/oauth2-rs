@@ -1,11 +1,11 @@
 use crate::{
-    token_response, ClientCredentialsTokenRequest, CodeTokenRequest, ErrorResponse, HttpRequest,
-    HttpResponse, PasswordTokenRequest, RefreshTokenRequest, RequestTokenError, TokenResponse,
-    TokenType,
+    token_response, ClientCredentialsTokenRequest, CodeTokenRequest, ErrorResponse,
+    PasswordTokenRequest, RefreshTokenRequest, RequestTokenError, TokenResponse, TokenType,
 };
 use async_trait::async_trait;
 use failure::Fail;
 use futures::Future;
+use http_types::{Request, Response};
 
 ///
 /// Asynchronous request to exchange an authorization code for an access token.
@@ -22,8 +22,8 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail;
 }
 
@@ -39,15 +39,15 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail,
     {
         let http_request = self.prepare_request()?;
         let http_response = http_client(http_request)
             .await
             .map_err(RequestTokenError::Request)?;
-        token_response(http_response)
+        token_response(http_response).await
     }
 }
 
@@ -66,8 +66,8 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail;
 }
 
@@ -83,15 +83,15 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail,
     {
         let http_request = self.prepare_request()?;
         let http_response = http_client(http_request)
             .await
             .map_err(RequestTokenError::Request)?;
-        token_response(http_response)
+        token_response(http_response).await
     }
 }
 
@@ -110,8 +110,8 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail;
 }
 
@@ -127,15 +127,15 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail,
     {
         let http_request = self.prepare_request()?;
         let http_response = http_client(http_request)
             .await
             .map_err(RequestTokenError::Request)?;
-        token_response(http_response)
+        token_response(http_response).await
     }
 }
 
@@ -154,8 +154,8 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail;
 }
 
@@ -172,14 +172,14 @@ where
     ///
     async fn request_async<C, F, RE>(self, http_client: C) -> Result<TR, RequestTokenError<RE, TE>>
     where
-        C: FnOnce(HttpRequest) -> F + Send,
-        F: Future<Output = Result<HttpResponse, RE>> + Send,
+        C: FnOnce(Request) -> F + Send,
+        F: Future<Output = Result<Response, RE>> + Send,
         RE: Fail,
     {
         let http_request = self.prepare_request()?;
         let http_response = http_client(http_request)
             .await
             .map_err(RequestTokenError::Request)?;
-        token_response(http_response)
+        token_response(http_response).await
     }
 }
